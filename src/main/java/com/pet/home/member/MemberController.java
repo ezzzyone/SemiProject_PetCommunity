@@ -569,7 +569,6 @@ public class MemberController {
 					kakaoTokenRequest,
 					String.class
 			);
-		System.out.println(response);
 		
 		// Gson, Json Simple, ObjectMapper
 				ObjectMapper objectMapper = new ObjectMapper();
@@ -581,8 +580,6 @@ public class MemberController {
 				} catch (JsonProcessingException e) {
 					e.printStackTrace();
 				}
-				
-				System.out.println("카카오 엑세스 토큰 : "+oauthToken.getAccess_token());
 				
 				RestTemplate rt2 = new RestTemplate();
 				
@@ -602,27 +599,23 @@ public class MemberController {
 						kakaoProfileRequest2,
 						String.class
 				);
-				System.out.println("응ㄱ답22 : "+response2.getBody());
 				
 				ObjectMapper objectMapper2 = new ObjectMapper();
 				KakaoProfile kakaoProfile = null;
 				try {
-					
 					kakaoProfile = objectMapper2.readValue(response2.getBody(), KakaoProfile.class);
 				} catch (JsonMappingException e) {
 					e.printStackTrace();
 				} catch (JsonProcessingException e) {
 					e.printStackTrace();
 				}
-				
-				
 				// UUID란 -> 중복되지 않는 어떤 특정 값을 만들어내는 알고리즘
 				// User 오브젝트 : username, password, email
 				MemberDTO memberDTO = new MemberDTO();
 				memberDTO.setUserId(kakaoProfile.getId().toString());
 				memberDTO.setUserName(kakaoProfile.getProperties().getNickname());
-				memberDTO.setRoleNum(2);
-				memberDTO.setAgValue(1);
+				memberDTO.setRoleNum(2); // 일반회원 가입
+				memberDTO.setAgValue(1); //개인정보 동의값
 				memberDTO.setAgMail(1);
 				memberDTO.setAgMes(1);
 				memberDTO.setBlock(0);
@@ -635,7 +628,6 @@ public class MemberController {
 		
 				HttpSession session = request.getSession();
 				session.setAttribute("member", memberDTO);
-				
 	
 			mv.addObject("msg","카카오 로그인 완료.");
 			mv.addObject("url","/");
