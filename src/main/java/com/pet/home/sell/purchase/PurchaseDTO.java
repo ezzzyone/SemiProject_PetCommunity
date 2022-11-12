@@ -17,6 +17,7 @@ public class PurchaseDTO {
     //결제번호
     private Long itemNum;
     private Long amount;
+    private Long itemPrice;
     private String userId;
     private String revStartDate;
     private String revEndDate;
@@ -39,6 +40,14 @@ public class PurchaseDTO {
     
     
     
+    
+    
+	public Long getItemPrice() {
+		return itemPrice;
+	}
+	public void setItemPrice(Long itemPrice) {
+		this.itemPrice = itemPrice;
+	}
 	public Long getPurchaseNum() {
 		return purchaseNum;
 	}

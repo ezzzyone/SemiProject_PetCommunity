@@ -5,8 +5,6 @@ const itemName2 = document.getElementById("itemName");
 function mapMaker(){
     let address = itemAddress.value;
     let inv = itemName2.value;
-    console.log(address);
-    console.log(inv);
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
         mapOption = {
             center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
@@ -35,8 +33,6 @@ function mapMaker(){
             
             let y = result[0].y;
             let x = result[0].x;
-            console.log(y);
-            console.log(x);
 
             // 인포윈도우로 장소에 대한 설명을 표시합니다
             var infowindow = new kakao.maps.InfoWindow({

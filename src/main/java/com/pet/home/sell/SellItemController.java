@@ -71,22 +71,16 @@ public class SellItemController {
 
 	@GetMapping("list")
 	public ModelAndView getItemList(SellPager sellPager, HttpSession session) throws Exception {
-		System.out.println(sellPager.getItemCatg());
 		ModelAndView mv = new ModelAndView();
-
 		List<SellItemDTO> ar = itemService.getItemList(sellPager);
 		CategoryDTO categoryDTO = itemService.getCategory(sellPager.getItemCatg());
-		
 		MemberDTO memberDTO = (MemberDTO)session.getAttribute("member");
 		if(memberDTO != null) {
-			
 			List<SellItemDTO> sellItemDTOs = itemService.getPickStatus(memberDTO);
 			mv.addObject("pick", sellItemDTOs);
 			List<SellItemDTO> sellItemDTOs2 = itemService.getShopCartStatus(memberDTO);
 			mv.addObject("shopcart", sellItemDTOs2);
 		}
-		
-	
 		mv.addObject("list", ar);
 		mv.addObject("pager", sellPager);
 		mv.addObject("category", categoryDTO);
@@ -95,15 +89,11 @@ public class SellItemController {
 	
 	@GetMapping("Sellerlist")
 	public ModelAndView getSellerList(SellPager sellPager, HttpSession session) throws Exception {
-		System.out.println(sellPager.getItemCatg());
 		ModelAndView mv = new ModelAndView();
-		
 		MemberDTO memberDTO = (MemberDTO)session.getAttribute("member");
 		sellPager.setUserId(memberDTO.getUserId());
-
 		List<SellItemDTO> ar = itemService.getSellerList(sellPager);
 		CategoryDTO categoryDTO = itemService.getCategory(sellPager.getItemCatg());
-		
 		mv.addObject("list", ar);
 		mv.addObject("pager", sellPager);
 		mv.addObject("category", categoryDTO);
@@ -146,7 +136,6 @@ public class SellItemController {
 	@PostMapping("add")
 	public ModelAndView setItemAddResult(SellItemDTO itemDTO, MultipartFile[] files, HttpSession session)
 			throws Exception {
-		System.out.println("add Post");
 		ModelAndView view = new ModelAndView();
 		session.getAttribute("member");
 		int result = itemService.setItemAdd(itemDTO, files, session.getServletContext());
@@ -185,13 +174,14 @@ public class SellItemController {
 		return result;
 	}
 
-	@GetMapping("delete")
-	public ModelAndView setItemDelete(SellItemDTO itemDTO, HttpSession session) throws Exception {
+	@PostMapping("delete")
+	@ResponseBody
+	public int setItemDelete(SellItemDTO itemDTO, HttpSession session) throws Exception {
+		System.out.println("delete");
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/sell/list?itemCatg=" + itemDTO.getItemCatg());
 		int result = itemService.setItemDelete(itemDTO, session.getServletContext());
-
-		return mv;
+		return result;
 	}
 	
 	@GetMapping("pettx")
@@ -223,6 +213,8 @@ public class SellItemController {
 	@ResponseBody
 	public int setShopCartAdd(ShopCartDTO shopCartDTO, HttpSession session) throws Exception {
 		MemberDTO memberDTO = (MemberDTO)session.getAttribute("member");
+		
+		System.out.println("dognum : "+shopCartDTO.getDogNum());
 		shopCartDTO.setUserId(memberDTO.getUserId());
 		int result = itemService.setShopCartAdd(shopCartDTO);
 		return result;
@@ -436,13 +428,18 @@ public class SellItemController {
 
 	@GetMapping("search")
 	public ModelAndView getItemOne(SellPager sellPager) throws Exception {
-		System.out.println(sellPager.getItemCatg());
-		System.out.println(sellPager.getSearch());
 		List<SellItemDTO> ar = itemService.getItemList(sellPager);
 		ModelAndView mv = new ModelAndView();
 		mv.addObject("list", ar);
 		mv.addObject("pager", sellPager);
 		return mv;
+	}
+	
+	@PostMapping("allCartDelete")
+	@ResponseBody
+	public int setAllCartDelete(ShopCartDTO shopCartDTO) throws Exception{
+		int result = itemService.setAllCartDelete(shopCartDTO);
+		return result;
 	}
 
 	//결제 진행 후 DB 인서트
@@ -468,10 +465,6 @@ public class SellItemController {
 			
 			Payment payment = client.paymentByImpUid(imp_uid).getResponse();
 			String paymentResult = payment.getStatus();
-			System.out.println("결제 객체: "+payment);
-			System.out.println("결제 상태: "+paymentResult);
-			System.out.println("Code: "+token.getCode());
-			System.out.println("token: "+token.getResponse().getToken());
 			
 			//결제되어야 할 금액 계산
 			Long totalPrice = itemService.setPrice(itemNum, revStartDate, revEndDate, adultsCount, dogCount); 
@@ -520,37 +513,27 @@ public class SellItemController {
 							return paymentResult;
 						}
 					
-				} else {
-					paymentResult = "결제 진행에 오류가 있습니다. 카드사에 문의해주세요.";
-					return paymentResult;
-				}
-			} else {//실결제 금액이 DB상 결제 금액과 다른 경우 DB에 인서트 되지 않고 결제 취소 진행
-					String reason = "결제 금액 상이함";
-					String code = itemService.setPurchaseCancel(token, reason, imp_uid);
-					if(code.equals("0")) {
-						paymentResult = "결제 금액 오류로 결제가 취소됩니다.";
-						return paymentResult;
-					} else {
-						paymentResult = "결제가 정상적으로 이루어지지 않았습니다. 카드사에 문의해주세요.";
-						return paymentResult;
-					}
-				}
-
-                          	            
+						} else {
+							paymentResult = "결제 진행에 오류가 있습니다. 카드사에 문의해주세요.";
+							return paymentResult;
+						}
+						} else {//실결제 금액이 DB상 결제 금액과 다른 경우 DB에 인서트 되지 않고 결제 취소 진행
+								String reason = "결제 금액 상이함";
+								String code = itemService.setPurchaseCancel(token, reason, imp_uid);
+								if(code.equals("0")) {
+									paymentResult = "결제 금액 오류로 결제가 취소됩니다.";
+									return paymentResult;
+								} else {
+									paymentResult = "결제가 정상적으로 이루어지지 않았습니다. 카드사에 문의해주세요.";
+									return paymentResult;
+								}
+						}
+		
+		                          	            
             }
-	
-	//결제 리스트 출력
-	public ModelAndView getPurchaseList(String userId) throws Exception{
-		PurchaseDTO checkDTO = new PurchaseDTO();
-		checkDTO.setUserId(userId);
-		System.out.println(checkDTO.getUserId());
-//		List<CheckDTO> checkList = itemService.getPurchaseList(checkDTO);
-		ModelAndView mv = new ModelAndView();
-//		mv.addObject("checkList", checkList);
-		return mv;		
-	}
-	
 
+	
+		
 	
 }
 

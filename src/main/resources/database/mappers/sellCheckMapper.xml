@@ -6,9 +6,9 @@
 	
 		
 	<insert id="setPurchase" parameterType="PurchaseDTO">
-		INSERT INTO PURCHASE 
+		INSERT INTO PURCHASE (PURCHASENUM, IMP_UID, MERCHANT_UID, ITEMNUM, AMOUNT, ITEMPRICE, USERID, REVSTARTDATE, REVENDDATE, ADULTSCOUNT, DOGCOUNT, PURCHASEDATE, PURCHASESTATUS)
 		VALUES 
-		(PURCHASE_SEQ.NEXTVAL, #{imp_uid}, #{merchant_uid}, #{itemNum}, #{amount}, #{userId}, #{revStartDate}, #{revEndDate}, #{adultsCount}, #{dogCount}, sysdate, 1)
+		(PURCHASE_SEQ.NEXTVAL, #{imp_uid}, #{merchant_uid}, #{itemNum}, #{amount}, #{itemPrice}, #{userId}, #{revStartDate}, #{revEndDate}, #{adultsCount}, #{dogCount}, sysdate, 1)
 	</insert>
 	
 	<insert id="setPurchaseCancelOne" parameterType="PurchaseCancelDTO">
@@ -131,6 +131,30 @@
 		ORDER BY P.PURCHASEDATE DESC) CHECKLIST
 	</select>
 	
+	<select id="getPDTest" parameterType="PurchaseDTO" resultMap="getPurchaseListResult">
+		SELECT ROWNUM R, CHECKLIST.* FROM        
+		(SELECT  P.*, M.USERNAME, M.EMAIL, M.PHONE, SITEM.USERID as BIZID, SITEM.ITEMNAME, SITEM.FILENAME, PC.CANCELDATE, PC.REASON FROM 
+		PURCHASE P
+		LEFT JOIN
+		PURCHASECANCEL PC
+		ON P.MERCHANT_UID = PC.MERCHANT_UID		
+			RIGHT JOIN
+			MEMBER M
+			ON P.USERID = M.USERID
+				RIGHT JOIN
+				(SELECT SII.* 
+                    FROM 
+                    (SELECT SI.ITEMNUM, SI.ITEMPRICE, SI.ITEMNAME, SI.ITEMCATG, SI.USERID, SI.ITEMADDRESS, SF.FILENAME
+                        FROM SELLITEM SI
+                        INNER JOIN
+                        SELLFILE SF
+                        ON SI.ITEMNUM = SF.ITEMNUM
+                        ORDER BY SI.ITEMNUM DESC,SF.PHOTONUM ASC) SII) SITEM
+				ON P.ITEMNUM = SITEM.ITEMNUM
+		WHERE P.MERCHANT_UID = #{merchant_uid}
+		ORDER BY P.PURCHASEDATE DESC) CHECKLIST
+	</select>
+	
 		<select id="getSellerPurchaseDetail" parameterType="PurchaseDTO" resultMap="getPurchaseListResult">
 		SELECT ROWNUM R, CHECKLIST.* FROM        
 		(SELECT  P.*, M.USERNAME, M.EMAIL, M.PHONE, SITEM.USERID as BIZID, SITEM.ITEMNAME, SITEM.FILENAME, PC.CANCELDATE, PC.REASON FROM 
@@ -160,10 +184,12 @@
 	</delete>
 	
 	<resultMap type="PurchaseDTO" id="getPurchaseListResult">
-		<id column="IMP_UID" property="imp_uid"/>
+		<id column="PURCHASENUM" property="purchaseNum"/>
+				<result column="IMP_UID" property="imp_uid"/>
 				<result column="MERCHANT_UID" property="merchant_uid"/>
 				<result column="ITEMNUM" property="itemNum"/>
 				<result column="AMOUNT" property="amount"/>
+				<result column="ITEMPRICE" property="itemPrice"/>
 				<result column="USERID" property="userId"/>
 				<result column="REVSTARTDATE" property="revStartDate"/>
 				<result column="REVENDDATE" property="revEndDate"/>

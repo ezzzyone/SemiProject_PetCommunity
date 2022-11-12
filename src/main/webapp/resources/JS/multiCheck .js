@@ -35,6 +35,18 @@ let date = new Date();
 let merchant_uid = date.getTime();
 const rvBtnFrm = document.getElementById("rvBtnFrm");
 let msg = "";
+const multiCheckBtn = document.getElementById("multiCheckBtn");
+const itnValueA = document.getElementsByClassName("itnValueA");
+
+
+
+const cartCheck = document.getElementsByClassName("cartCheck");
+for(let i=0; i<cartCheck.length; i++){
+  cartCheck[i].addEventListener("click",function(){
+    console.log(cartCheck[i].checked);
+  })
+}
+
 
 
 
@@ -82,64 +94,59 @@ let cpn = "";
 
 
 
-
-        
-          // ------ 쿠폰 계산
-          if(coupon.value != ""){
+let couponi = 0;
+coupon.addEventListener("change", function(){     
+  // ------ 쿠폰 계산
+         if(coupon.value != ""){
+                couponi++;
+              if(couponi > 1){
+                  return;
+              }
             arr = coupon.value.split("|");
 
             rp = arr[0];
             couponNum = arr[1];
             method = arr[2];
             
-
+           
             rp = Number(rp);
 
             if(method == '0'){
               totalPrice.value = totalPrice.value*(100-rp)/ 100;
               tpv = totalPrice.value; 
+              // coupontotal.value=totalPrice.value;
+              // abc = totalPrice.value;
             }else{
               totalPrice.value = totalPrice.value - rp;
               tpv = totalPrice.value;
+              // coupontotal.value = totalPrice.value;
+              // abc = totalPrice.value;
             }
             
             coupon.value = couponNum;
             cpn = couponNum;
+          }else{
+            totalPrice.value = abc;
+            couponi--;
           }
-function cart(cartArr){
+})
 
-    for(let i=0; i<cartArr.length; i=i+7){
-      console.log(cartArr[i]);
-      console.log(cartArr[i+1]);
-      console.log(cartArr[i+2]);
-      console.log(cartArr[i+3]);
-      console.log(cartArr[i+4]);
-      console.log(cartArr[i+5]);
-      console.log(cartArr[i+6]);
-    }
-  }
 //==================================================================결제창 실행
-rvBtnFrm.addEventListener("click", function (){
+multiCheckBtn.addEventListener("click", function (){
+  let dateResult = false;
+  let itnArr = [];
     
-   
+  for(let i=0; i<itnValueA.length; i++){
+    itnArr.push(itnValueA[i].getAttribute("data-item-num"));
+  }
 
-    let dateResult = false;
-    itn = itemNum2.value;
-    itg = itemCatg.value;
-    rsv = revStartDate.value;
-    rev = revEndDate.value;
-    ac = adultsCount.value;
-    dc = dogCount.value;
+    inv = itnValueA[0].getAttribute("data-item-name")+"외";
     tpv = totalPrice.value;
     bev = buyer_email.value;
     bnv = buyer_name.value;
     btv = buyer_tel.value;
     uiv = userId.value;
-    inv = itemName.value;
     cpn = couponNum;
-
-    console.log(tpv);
-    console.log(uiv);
   
     if(tpv<=0){
     alert("예상 결제 금액을 다시 확인해주세요")
@@ -155,11 +162,7 @@ rvBtnFrm.addEventListener("click", function (){
 
 //=====================================================================결제 api
   function requestPay() {
-    
-    console.log(uiv);
-    console.log(tpv);
-    console.log(cpn);
-    
+   
     // IMP.request_pay(param, callback) 결제창 호출
     IMP.request_pay({ // param
         pg: "html5_inicis",
@@ -170,24 +173,26 @@ rvBtnFrm.addEventListener("click", function (){
         buyer_email: bev,
         buyer_name: bnv,
         buyer_tel: btv,
-        revStartDate: rsv,
         notice_url : 'http://localhost/member/purchaseList'
     }, function (rsp) { // callback
         // 결제검증
         if (rsp.success) { // 결제 성공 시: 결제 승인 또는 가상계좌 발급에 성공한 경우
+          let itnArr = [];
+    
+          for(let i=0; i<itnValueA.length; i++){
+            itnArr.push(itnValueA[i].getAttribute("data-item-num"));
+          }
+         
           // jQuery로 HTTP 요청
           $.ajax({
-              url: "./payments", // 예: https://www.myservice.com/payments/complete
+              url: "./cartPayments", // 예: https://www.myservice.com/payments/complete
               type: "POST",
+              traditional: true,
               data: {
                   'imp_uid': rsp.imp_uid,
                   'merchant_uid': rsp.merchant_uid,
                   'amount': tpv,
-                  'revStartDate': rsv,
-                  'itemNum': itn,
-                  'revEndDate': rev,
-                  'adultsCount': ac,
-                  'dogCount': dc,
+                  'itemNum': itnArr,
                   'userId': uiv,
                   'couponNum' : cpn
               },
@@ -202,7 +207,25 @@ rvBtnFrm.addEventListener("click", function (){
                 console.log(paymentResult);
                 if(paymentResult=="paid") {
                   alert("결제에 성공하였습니다!")
-                  window.location.href = 'http://localhost/member/purchaseList';
+                  $.ajax({
+                    url: "../sell/allCartDelete",
+                    type: "POST",
+                    data: {
+                      'userId': uiv
+                    },
+                    error : function(xhr,status,error){
+                      console.log(xhr.responseText);
+                      console.log(status);
+                      console.log(error);
+                      let data = xhr.responseText;
+                      console.log(data);
+                    },
+                    success : function(result){
+                      if(result == "1"){
+                        window.location.href = 'http://localhost/member/purchaseList';
+                      }
+                    }
+                  })
               } else{
                 alert("결제에 실패하였습니다. 결제 실패 사유: " + paymentResult);
                 location.reload();

@@ -225,6 +225,10 @@
               </c:when>
 
         <c:when test="${what eq 'cart'}">
+          <input type="hidden" id="buyer_email" value="${sessionScope.member.email}">
+          <input type="hidden" id="buyer_name" value="${sessionScope.member.userName}">
+          <input type="hidden" id="buyer_tel" value="${sessionScope.member.phone}">
+          <input type="hidden" id="userId" value="${sessionScope.member.userId}">
         	<table class="table">
 				<thead>
 					<tr>
@@ -232,43 +236,50 @@
 					</tr>
 				</thead>
 				<tbody>
+					<c:if test="${not empty list }">
 					<c:forEach items="${list.itemDTOs}" var="itemDTO">
 					<tr>
-						<td>${itemDTO.itemNum }</td>
+						<td class="itnValueA" data-item-num="${itemDTO.itemNum}" data-item-name="${itemDTO.itemName}">${itemDTO.itemNum }</td>
 						<td><img style="border: 0px; outline: 0px; width: 70px; height: 70px;" src="/resources/upload/sellfile/${itemDTO.fileDTOs['0'].fileName}" class="img-fluid" alt=""></td>
           				<td>${itemDTO.itemName }</td>
           				<td>${itemDTO.shopCartDTOs[0].totalPrice }</td>
           				<td>${itemDTO.shopCartDTOs[0].revStartDay }</td>
           				<td>${itemDTO.shopCartDTOs[0].revEndDay }</td>
-          				<td>${itemDTO.shopCartDTOs[0].adultsNum }</td>
-          				<td>${itemDTO.shopCartDTOs[0].dogNum }</td>
+          				<td>${itemDTO.shopCartDTOs[0].adultsNum +1 }</td>
+          				<td>${itemDTO.shopCartDTOs[0].dogNum +1}</td>
           				<td><button type="button" id="rvBtnFrm" class="btnCartDelete" data-item-num="${itemDTO.itemNum }" style="border: 1px solid gray; border-radius: 10px; width: 70px; height: 70px;"><img src="/resources/images/close.png" class="img-fluid" alt=""></button></td>
           			</tr>
         			</c:forEach>
         		</tbody>
+          </c:if>
         	</table>
-        	<div>
-        		총금액:<input type="text" readonly="readonly" value="${total.totalPrice }">
-        		<button type="button" class="btn btn-danger">결제하기</button>
-        	</div>
-          <div>
-            <c:catch>
+          <c:if test="${not empty list }">
+            <div>
+              총금액:<input type="text" readonly="readonly" value="${total.totalPrice}" id="totalPrice">
+              <button type="button" class="btn btn-danger" id="multiCheckBtn">결제하기</button>
+            </div>
+          </c:if>
+          <c:if test="${not empty list }">
+
+            <div>
+              <c:catch>
                 <label for="contents" class="form-label">적용할 쿠폰</label>
-                <select class="form-select" id="coupon" name ="couponNum">
-                <option value="">선택</option>
-                <c:forEach items="${couponList}" var="coupon">
-                  <c:choose>
-                    <c:when test="${coupon.discountMethod eq '0'}">
-                      <option value="${coupon.discountRate}|${coupon.couponNum}|${coupon.discountMethod}"> 쿠폰명 : ${coupon.couponName} ( 할인율 : ${coupon.discountRate} % )</option>
-                    </c:when>
-                    <c:otherwise>
-                      <option value="${coupon.discountPrice}|${coupon.couponNum}|${coupon.discountMethod}"> 쿠폰명 : ${coupon.couponName} ( 할인금액 : ${coupon.discountPrice} 원 )</option>
-                    </c:otherwise>
-                  </c:choose>
-                </c:forEach>
+                  <select class="form-select" id="coupon" name ="couponNum">
+                    <option value="">선택</option>
+                  <c:forEach items="${couponList}" var="coupon">
+                    <c:choose>
+                      <c:when test="${coupon.discountMethod eq '0'}">
+                        <option value="${coupon.discountRate}|${coupon.couponNum}|${coupon.discountMethod}"> 쿠폰명 : ${coupon.couponName} ( 할인율 : ${coupon.discountRate} % )</option>
+                      </c:when>
+                      <c:otherwise>
+                        <option value="${coupon.discountPrice}|${coupon.couponNum}|${coupon.discountMethod}"> 쿠폰명 : ${coupon.couponName} ( 할인금액 : ${coupon.discountPrice} 원 )</option>
+                      </c:otherwise>
+                    </c:choose>
+                  </c:forEach>
                 </select>
-            </c:catch>
-          </div>
+              </c:catch>
+            </div>
+          </c:if>
          
         </c:when>
 
@@ -406,27 +417,11 @@
   <c:import url="/WEB-INF/views/template/footer.jsp"></c:import>
   <!-- footer end -->
   
+  <script>
+    let abc = "${total.totalPrice}";
+  </script>
   <script src="/resources/JS/follow.js"></script>
   <script src="/resources/JS/multiCheck .js"></script>
-  <script>
-        
-
-        var cartArr = new Array();
-  
-        <c:forEach items="${list.itemDTOs}" var="itemDTO">
-          cartArr.push("${itemDTO.itemNum}");
-          cartArr.push("${itemDTO.itemName}");
-          cartArr.push("${itemDTO.shopCartDTOs[0].totalPrice }");
-          cartArr.push("${itemDTO.shopCartDTOs[0].revStartDay }");
-          cartArr.push("${itemDTO.shopCartDTOs[0].revEndDay }");
-          cartArr.push("${itemDTO.shopCartDTOs[0].adultsNum }");
-          cartArr.push("${itemDTO.shopCartDTOs[0].dogNum }");
-        </c:forEach> 
-
-        cart(cartArr);
-
-      
-  </script>
 
 <!-- <script>
   function getParameter(name) {

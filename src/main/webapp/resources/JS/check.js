@@ -92,12 +92,13 @@ if(btnShopCartFalse == null){
       }
       else if(tpv>0){
           let itemNum = btnShopCartAdd.getAttribute("data-item-num");
+          let itemPrice = 0;
           if(rp == null){
-            let itemPrice = tpv;
+            itemPrice = tpv;
           }
           else{
             tpv = totalPrice.value*100/(100-rp)
-            let itemPrice = tpv;
+            itemPrice = tpv;
           }
           let revStartDay = rsv;
           let revEndDay = rev;
@@ -106,7 +107,7 @@ if(btnShopCartFalse == null){
           const xHttp = new XMLHttpRequest();
           xHttp.open("POST","./shopcartadd");
           xHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-          xHttp.send("itemNum="+itemNum+"&itemPrice="+itemPrice+"&revStartDay="+revStartDay+"&revEndDay="+revEndDay+"&adultsNum="+adultsNum+"&dogNum="+dogNUM);
+          xHttp.send("itemNum="+itemNum+"&totalPrice="+itemPrice+"&revStartDay="+revStartDay+"&revEndDay="+revEndDay+"&adultsNum="+adultsNum+"&dogNum="+dogNUM);
           xHttp.onreadystatechange = function(){
               if(xHttp.readyState == 4 && xHttp.status == 200){
                   let result = xHttp.responseText.trim();
@@ -288,10 +289,6 @@ rvBtnFrm.addEventListener("click", function(){
 //=====================================================================결제 api
   function requestPay() {
     
-    console.log(uiv);
-    console.log(tpv);
-    console.log(cpn);
-    
     // IMP.request_pay(param, callback) 결제창 호출
     IMP.request_pay({ // param
         pg: "html5_inicis",
@@ -323,12 +320,8 @@ rvBtnFrm.addEventListener("click", function(){
                   'userId': uiv,
                   'couponNum' : cpn
               },
-              error : function(xhr,status,error){
-                console.log(xhr.responseText);
-                console.log(status);
+              error : function(error){
                 console.log(error);
-                let data = xhr.responseText;
-                console.log(data);
               },
               success : function(paymentResult){
                 console.log(paymentResult);
@@ -352,4 +345,3 @@ rvBtnFrm.addEventListener("click", function(){
         }
       })
   };
-

@@ -103,9 +103,7 @@ sellFileImages.addEventListener("change", function(event){
 
 // add page: 파일 삭제=======================================================
 imgDiv.addEventListener("click", function(event){
-    console.log(event.target);
     const df = event.target;
-    console.log(df.id);
     let result = window.confirm("삭제하시겠습니까?")
       if(!result){
                return;
@@ -123,8 +121,6 @@ imgDiv.addEventListener("click", function(event){
 // add 조건 설정
 
 addItemBtn.addEventListener("click", function(){
-    console.log("b");
-
     let inResult = false;
     let ipResult = false;
     let imgResult = false;

@@ -34,23 +34,23 @@
 	
 	<beans:bean id="echoHandler" class="com.pet.home.chat.room.EchoHandler"></beans:bean>
 	
-	 <!-- Interceptor 객체 생성 -->
+	 <!-- Interceptor 객체 생성 
 	<beans:bean class="com.pet.home.interceptor.SellitemInterceptor" id="sellitemInterceptor"></beans:bean>
 	
 	<beans:bean class="com.pet.home.interceptor.AdminCheckInterceptor" id="adminCheckInterceptor"></beans:bean>
 	<beans:bean class="com.pet.home.interceptor.MemberInterceptor" id="memberInterceptor"></beans:bean>
 	<beans:bean class="com.pet.home.interceptor.WriterCheckInterceptor" id="writerCheckInterceptor"></beans:bean>
 	
-	   <interceptors>
+	   <interceptors> -->
    
-   <!--  관리자 인터셉터 -->
+   <!--  관리자 인터셉터 
    <interceptor>
       <mapping path="/notice/**"/>
       <mapping path="/admin/**"/>
       <exclude-mapping path="/notice/list"/>
       <exclude-mapping path="/notice/detail"/>
       <beans:ref bean="adminCheckInterceptor"/>
-   </interceptor>
+   </interceptor> -->
    
    <!-- <interceptor>
       <mapping path="/qna/update"/>
@@ -88,7 +88,7 @@
    </interceptor> -->
     
    
-      <!-- URL, Interceptor 매핑 -->
+      <!-- URL, Interceptor 매핑 
        <interceptor>
          <mapping path="/sell/*"/>
          <exclude-mapping path="/sell/list"/>
@@ -102,7 +102,7 @@
          <beans:ref bean="sellitemInterceptor"/>      
       </interceptor>
     
-   </interceptors> 
+   </interceptors> -->
 	
 	<context:component-scan base-package="com.pet.home" />
 	

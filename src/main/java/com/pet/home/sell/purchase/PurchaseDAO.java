@@ -43,5 +43,8 @@ public class PurchaseDAO {
 	}
 	
 	
-	
+	public List<PurchaseDTO> getPDTest(PurchaseDTO purchaseDTO) throws Exception{
+		return session.selectList(NAMESPACE+"getPDTest", purchaseDTO);
+	}
+		
 }

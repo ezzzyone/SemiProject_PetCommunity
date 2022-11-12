@@ -94,9 +94,7 @@ sellFileImages.addEventListener("change", function(event){
 
 // add page: 파일 삭제=======================================================
 imgDiv.addEventListener("click", function(event){
-    console.log(event.target);
     const df = event.target;
-    console.log(df.id);
     let result = window.confirm("삭제하시겠습니까?")
       if(!result){
                return;
@@ -114,14 +112,12 @@ imgDiv.addEventListener("click", function(event){
 //update page: 파일 삭제
 uFileDelete.forEach(function(f){
     f.addEventListener("click", function(){
-        console.log(f.parentNode);
         let result = window.confirm("삭제하시겠습니까?");
         if(!result){
             return;
         }
 
         let photoNum = f.getAttribute("data-photo-num");
-        console.log(photoNum);
 
         const xhttp = new XMLHttpRequest();
         xhttp.open("post","./filedelete");

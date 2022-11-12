@@ -7,7 +7,6 @@ public class ShopCartDTO {
 	private Long totalPrice;
 	private Long totalCount;
 	private String shopStatus;
-	private Long itemPrice;
 	private String revStartDay;
 	private String revEndDay;
 	private Long adultsNum;
@@ -36,12 +35,6 @@ public class ShopCartDTO {
 	}
 	public void setDogNum(Long dogNum) {
 		this.dogNum = dogNum;
-	}
-	public Long getItemPrice() {
-		return itemPrice;
-	}
-	public void setItemPrice(Long itemPrice) {
-		this.itemPrice = itemPrice;
 	}
 	public Long getShopNum() {
 		return shopNum;

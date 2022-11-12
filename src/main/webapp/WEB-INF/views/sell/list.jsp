@@ -173,7 +173,7 @@
             <li class="page-item"><a class="page-link" href="./list?page=${i}&itemCatg=${pager.itemCatg}&search=${pager.search}"> ${i}</a> </li>
           </c:forEach>
           <li class="page-item ${pager.next?'':'disabled'}">
-            <a class="page-link" href="./list.do?page=${pager.lastNum+1}&itemCatg=${pager.itemCatg}&search=${pager.search}" aria-label="Next">
+            <a class="page-link" href="./list?page=${pager.lastNum+1}&itemCatg=${pager.itemCatg}&search=${pager.search}" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>

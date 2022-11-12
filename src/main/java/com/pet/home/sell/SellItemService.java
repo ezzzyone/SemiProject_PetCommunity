@@ -2,7 +2,6 @@ package com.pet.home.sell;
 
 import java.io.File;
 
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -71,6 +70,11 @@ public class SellItemService {
 	public IamportClient getClient() {
 		this.client = new IamportClient("7768266328715148", "uETnhxe3MbNMjFN4Gs6U5PuiYYR6TWf9SFcGncxj9SWEcDAysad8JZmNnOYpChUkXzIdw7Ld9uTaSWuP");
 		return client;
+	}
+	
+	public int setAllCartDelete(ShopCartDTO shopCartDTO) throws Exception{
+		int result = shopCartDAO.setAllCartDelete(shopCartDTO);
+		return result;
 	}
 	
 	
@@ -430,6 +434,10 @@ public class SellItemService {
 		return purchaseDAO.getPurchaseDetail(purchaseDTO); 
 	}
 	
+	public List<PurchaseDTO> getPDTest(PurchaseDTO purchaseDTO) throws Exception{
+		return purchaseDAO.getPDTest(purchaseDTO);
+	}
+	
 	//아임포트 서버에서 전액 환불 진행
 	public String setPurchaseCancel(IamportResponse<AccessToken> token, String reason, String imp_uid) throws Exception{
 		RestTemplate restTemplate = new RestTemplate();
@@ -500,7 +508,6 @@ public class SellItemService {
 		itemDTO.setItemNum(Long.parseLong(itemNum));
 		itemDTO = itemDAO.getDetailOne(itemDTO);
 		Long itemPrice = itemDTO.getItemPrice();
-		System.out.println("itemPrice: "+itemPrice);
 		
 		Date start = new SimpleDateFormat("yyyy-MM-dd").parse(revStartDate);
 		Date end = new SimpleDateFormat("yyyy-MM-dd").parse(revEndDate);
@@ -509,10 +516,13 @@ public class SellItemService {
 		if(end.getTime() == start.getTime()) {
 			revDays = 1L;
 		}
-		System.out.println("revDays: "+revDays);
 		Long totalPrice = (itemPrice * revDays)+(10000*Long.parseLong(adultsCount))+(10000*Long.parseLong(dogCount));
-		System.out.println("totalPrice: "+totalPrice);
 		return totalPrice;
+	}
+	
+	//장바구니 목록 중 한개 가져오기
+	public ShopCartDTO getCartOne(ShopCartDTO shopCartDTO) throws Exception{
+		return shopCartDAO.getCartOne(shopCartDTO);
 	}
 }
 	
